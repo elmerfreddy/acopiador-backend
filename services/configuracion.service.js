@@ -4,6 +4,8 @@ const debug = require("debug")("app:services");
 const pool = require("../libs/postgres.pool");
 
 class ConfiguracionService {
+  // configuracion
+
   async find() {
     const query = "SELECT * FROM conf_dataset WHERE estado='ACTIVO';";
     const rta = await pool.query(query);
@@ -43,8 +45,8 @@ class ConfiguracionService {
       data.file_example,
     ]);
 
-    const id_conf = rta.rows[0].id;
-    return id_conf;
+    const configuracion = rta.rows[0];
+    return configuracion;
   }
 
   async update(id, changes) {
@@ -80,13 +82,6 @@ class ConfiguracionService {
       configuracionChanged.file_example,
       id,
     ]);
-
-    const id_conf = rta.rows[0].id;
-    try {
-      await this.updateAtributo(id, data.atributos);
-    } catch (error) {
-      next(error);
-    }
   }
 
   async delete(id) {
@@ -99,31 +94,58 @@ class ConfiguracionService {
     return rta.rows[0];
   }
 
+  // atributos
+
+  async findAtributo(id_configuracion) {
+    const query = "SELECT * FROM atributos WHERE id_conf_dataset=$1;";
+    const rta = await pool.query(query, [id_configuracion]);
+    return rta.rows;
+  }
+
+  async findAtributoById(id_configuracion, id_atributo) {
+    const query = "SELECT * FROM atributos WHERE id_conf_dataset=$1 AND id=$2;";
+    const rta = await pool.query(query, [id_configuracion, id_atributo]);
+    if (!rta.rowCount) {
+      throw boom.notFound("Registro no encontrado");
+    }
+    return rta.rows[0];
+  }
+
   async createAtributo(id, data) {
     const query =
-      "INSERT INTO atributo (id_conf_dataset, nombre, tipo, ejemplo) VALUES ($1, $2, $3, $4) RETURNING *;";
+      "INSERT INTO atributos (id_conf_dataset, nombre, tipo, ejemplo) VALUES ($1, $2, $3, $4) RETURNING *;";
     const rta = await pool.query(query, [
       id,
       data.nombre,
       data.tipo,
       data.ejemplo,
     ]);
+    const atributo = rta.rows[0];
+    return atributo;
   }
 
-  async updateAtributo(data) {
+  async updateAtributo(id_configuracion, id_atributo, changes) {
+    const atributo = await this.findAtributoById(id_configuracion, id_atributo);
+    debug('antiguo: ',atributo);
+    const atributoChanged = {
+      ...atributo,
+      ...changes,
+    };
+    debug('nuevo: ',atributoChanged);
     const query =
-      "UPDATE atributo SET nombre=$1, tipo=$2, ejemplo=$3 WHERE id=$4 ;";
+      "UPDATE atributos SET nombre=$1, tipo=$2, ejemplo=$3 WHERE id=$4 AND id_conf_dataset=$5;";
     const rta = await pool.query(query, [
-      data.nombre,
-      data.tipo,
-      data.ejemplo,
-      data.id,
+      atributoChanged.nombre,
+      atributoChanged.tipo,
+      atributoChanged.ejemplo,
+      id_atributo,
+      id_configuracion,
     ]);
   }
 
-  async deleteAtributo(id) {
-    const query = "DELETE FROM atributo WHERE id=$1;";
-    const rta = await pool.query(query, [id]);
+  async deleteAtributo(id_configuracion, id_atributo) {
+    const query = "DELETE FROM atributos WHERE id=$1 AND id_conf_dataset=$2;";
+    const rta = await pool.query(query, [id_atributo, id_configuracion]);
     debug(rta);
     if (!rta.rowCount) {
       throw boom.notFound("Registro no encontrado");

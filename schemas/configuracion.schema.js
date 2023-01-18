@@ -18,6 +18,10 @@ const atributos_update = Joi.array().items({
 });
 const estado = Joi.string();
 
+const getConfiguracionSchema = Joi.object({
+  id: id.required(),
+});
+
 const createConfiguracionSchema = Joi.object({
   id_entidad: id.required(),
   descripcion: texto.required(),
@@ -31,7 +35,6 @@ const createConfiguracionSchema = Joi.object({
   ws_body: texto,
   formulario: texto,
   file_example: url,
-  atributos: atributos_create,
 });
 
 const updateConfiguracionSchema = Joi.object({
@@ -47,15 +50,36 @@ const updateConfiguracionSchema = Joi.object({
   ws_body: texto,
   formulario: texto,
   file_example: url,
-  atributos: atributos_update,
 });
 
-const getConfiguracionSchema = Joi.object({
-  id: id.required(),
+const getAtributoSchema = Joi.object({
+  id_c: id.required(),
 });
+
+const getAtributoByConfSchema = Joi.object({
+  id_c: id.required(),
+  id_a: id.required(),
+});
+
+const createAtributoSchema = Joi.object({
+  nombre: texto.required(),
+  tipo: texto.required(),
+  ejemplo: texto
+});
+
+const updateAtributoSchema = Joi.object({
+  nombre: texto,
+  tipo: texto,
+  ejemplo: texto
+});
+
 
 module.exports = {
   createConfiguracionSchema,
   updateConfiguracionSchema,
   getConfiguracionSchema,
+  getAtributoSchema,
+  getAtributoByConfSchema,
+  createAtributoSchema,
+  updateAtributoSchema
 };
