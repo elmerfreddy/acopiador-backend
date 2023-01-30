@@ -9,6 +9,8 @@ const entidadesRouter = require("./entidades.router");
 const usuariosRouter = require("./usuarios.router");
 const authRouter = require("./auth.router");
 const configuracionRouter = require("./configuracion.router");
+const archivoRouter = require("./archivo.router");
+const entradaRouter = require("./entrada.router");
 
 function routerApi(app) {
   const router = express.Router();
@@ -31,6 +33,10 @@ function routerApi(app) {
   router.use("/auth", authRouter);
 
   router.use("/configuracion", configuracionRouter);
+
+  router.use("/archivo", archivoRouter);
+
+  router.use("/entrada", entradaRouter);
 }
 
 module.exports = routerApi;

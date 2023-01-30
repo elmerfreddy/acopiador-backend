@@ -25,11 +25,10 @@ class ConfiguracionService {
     let query = "INSERT INTO conf_dataset ";
     query =
       query +
-      "(id_entidad, descripcion, conf_tipo, metodo, metrica_nombre, metrica_tipo, metrica_ejemplo, ws_url, ws_token, ws_body, formulario, file_example) ";
+      "(id_entidad, descripcion, conf_tipo, metodo, metrica_nombre, metrica_tipo, metrica_ejemplo, ws_url, ws_token, ws_body, formulario, file_example, file_nombre) ";
     query =
       query +
-      "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *;";
-    debug(query);
+      "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *;";
     const rta = await pool.query(query, [
       data.id_entidad,
       data.descripcion,
@@ -43,6 +42,7 @@ class ConfiguracionService {
       data.ws_body,
       data.formulario,
       data.file_example,
+      data.file_nombre
     ]);
 
     const configuracion = rta.rows[0];
@@ -63,8 +63,8 @@ class ConfiguracionService {
       "id_entidad=$1, descripcion=$2, conf_tipo=$3, metodo=$4, metrica_nombre=$5, metrica_tipo=$6, ";
     query =
       query +
-      "metrica_ejemplo=$7, ws_url=$8, ws_token=$9, ws_body=$10, formulario=$11, file_example=$12 ";
-    query = query + "WHERE id=$13";
+      "metrica_ejemplo=$7, ws_url=$8, ws_token=$9, ws_body=$10, formulario=$11, file_example=$12, file_nombre=$13 ";
+    query = query + "WHERE id=$14";
     debug(query);
 
     const rta = await pool.query(query, [
@@ -80,6 +80,7 @@ class ConfiguracionService {
       configuracionChanged.ws_body,
       configuracionChanged.formulario,
       configuracionChanged.file_example,
+      configuracionChanged.file_nombre,
       id,
     ]);
   }

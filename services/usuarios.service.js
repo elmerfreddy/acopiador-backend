@@ -26,7 +26,7 @@ class UsuariosService {
     } catch (error) {
       if (error.constraint == "UQ_usuarios_email") {
         throw boom.badRequest(
-          "El correo ya se encuentra registrado, intente con otro correo por favor."
+          "El correo ya se encuentra registrado."
         );
       } else {
         next(error);
@@ -46,7 +46,6 @@ class UsuariosService {
     const query =
       "SELECT id, id_entidad, nombre, apellido, cargo, celular, email, estado, rol FROM usuarios WHERE estado='ACTIVO';";
     const rta = await pool.query(query);
-    delete rta.rows.password;
     return rta.rows;
   }
 

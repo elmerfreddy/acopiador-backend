@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const formidableMiddleware = require('express-formidable'); 
 const routerApi = require("./routes");
+const { config } = require('./config/config');
 const debug = require("debug")("app:app");
 
 const {logErrors, boomErrorHandler, errorHandler } = require('./middlewares/error.handler');
@@ -9,6 +11,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(formidableMiddleware({uploadDir:config.tmpDir}));
 
 const whitelist = ["http://localhost:8080"];
 const options = {
@@ -26,7 +29,7 @@ app.use(cors(options));
 require('./utils/auth');
 
 app.get("/", (req, res) => {
-  res.send("Hola mi server en express");
+  res.send("SUIN");
 });
 
 routerApi(app);
