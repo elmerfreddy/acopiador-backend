@@ -1,10 +1,13 @@
 const boom = require("@hapi/boom");
 var XLSX = require("xlsx");
-const url = require("url");
+const _ = require('lodash');
 const debug = require("debug")("app:services");
 
 const { config } = require("./../config/config");
 const pool = require("../libs/postgres.pool");
+const ConfiguracionService = require("./configuracion.service");
+
+const service = new ConfiguracionService();
 
 class EntradaService {
   async find() {
@@ -17,7 +20,11 @@ class EntradaService {
   async findById(id) {
     const query = "SELECT * FROM dataset_entrada WHERE id=$1;";
     const rta = await pool.query(query, [id]);
-    return rta.rows;
+    debug(rta.rowCount)
+    if (!rta.rowCount) {
+      throw boom.notFound("Registro no encontrado");
+    }
+    return rta.rows[0];
   }
 
   async findByEntidad(id) {
@@ -69,19 +76,56 @@ class EntradaService {
   }
 
   async loadArchivo(id, file) {
-    debug(file.file.path);
-    debug(config.tmpDir);
-    let file_url = file.file.path;
+    const date = new Date().getTime();
+    const file_name = date + "_" + file.file.name;
+    const file_url = "./files/entrada/" + file_name;
+    try {
+      await file.file.mv(file_url);
+    } catch (error) {
+      throw boom.internal("No se pudo subir el archivo.");
+    }
+
+    debug("archivo almacenado en: ", file_url);
+    return file_url;
+  }
+
+  async saveData(id, file_url) {
+    debug("almacenando archivo en BD...");
+
+    const header_wb = XLSX.readFile(file_url, { sheetRows: 1 });
+    const header_csv = XLSX.utils.sheet_to_csv(
+      header_wb.Sheets[header_wb.SheetNames[0]]
+    );
+    const header = header_csv.split(",");
+    debug(header);
+
+    const headerValidado = await this.validarHeader(id, header);
+
     const wb = XLSX.readFile(file_url);
     const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    const atributos = { ...json };
-    file_url = file_url.replace(/\\/g, "/");
-    file_url = "./" + file_url;
-    debug(file_url);
-    debug("atributos:", atributos);
 
-    await this.update(id, { atributos, file_url });
+    const atributos = JSON.stringify(json);
     return "ok";
+  }
+
+  async validarHeader(id, header) {
+    // obtener header
+    const entrada = await this.findById(id);
+    const id_config = entrada.id_conf_dataset;    
+    const configuracion = await service.findById(id_config);
+    const atributos = await service.findAtributo(id_config);
+    var header_bd = [];
+    for (let i = 0; i < atributos.length; i++) {
+      const nombre = atributos[i].nombre;
+      header_bd.push(nombre);
+    }
+    header_bd.push(configuracion.metrica_nombre);
+
+    // comparar headers
+    debug("header_bd:", header_bd);
+    debug("header:", header);
+    const isEqual = _.isEqual(header_bd, header)
+    debug("igual:",isEqual);
   }
 
   async download(id) {

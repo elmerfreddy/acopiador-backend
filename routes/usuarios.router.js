@@ -17,7 +17,7 @@ const router = express.Router();
 const service = new UsuariosService();
 
 router.get("/", 
-checkRoles('ADMIN', 'OBSCD'),
+checkRoles('ADMIN', 'USER1'),
 async (req, res, next) => {
   try {
     const usuarios = await service.find();
@@ -29,7 +29,7 @@ async (req, res, next) => {
 
 router.get(
   "/:id",
-  checkRoles('ADMIN', 'OBSCD'),
+  checkRoles('ADMIN', 'USER1'),
   validatorHandler(getUsuarioSchema, "params"),
   async (req, res, next) => {
     try {
@@ -44,7 +44,7 @@ router.get(
 
 router.post(
   "/",
-  checkRoles('ADMIN', 'OBSCD'),
+  checkRoles('ADMIN', 'USER1'),
   validatorHandler(createUsuarioSchema, "body"),
   async (req, res, next) => {
     try {
@@ -79,7 +79,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  checkRoles('ADMIN', 'OBSCD'),
+  checkRoles('ADMIN', 'USER1'),
   validatorHandler(getUsuarioSchema, "params"),
   async (req, res, next) => {
     try {

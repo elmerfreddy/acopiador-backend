@@ -20,13 +20,13 @@ function routerApi(app) {
   router.use(
     "/entidades",
     passport.authenticate("jwt", { session: false }),
-    checkRoles('ADMIN', 'OBSCD'),
+    checkRoles('ADMIN', 'USER1'),
     entidadesRouter
   );
 
   router.use(
     "/usuarios",
-    passport.authenticate("jwt", { session: false }),
+    // passport.authenticate("jwt", { session: false }),
     usuariosRouter
   );
   

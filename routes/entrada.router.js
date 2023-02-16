@@ -85,7 +85,8 @@ router.post(
     try {
       const { id } = req.params;
       const file = req.files;
-      const data = await service.loadArchivo(id, file);
+      const url = await service.loadArchivo(id, file)      
+      const data = await service.saveData(id, url)
       res.status(200).json(data);
     } catch (error) {
       next(error);

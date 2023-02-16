@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const formidableMiddleware = require('express-formidable'); 
+const fileUpload = require('express-fileupload');
 const routerApi = require("./routes");
 const { config } = require('./config/config');
 const debug = require("debug")("app:app");
@@ -11,7 +11,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(formidableMiddleware({uploadDir:config.tmpDir}));
+app.use(fileUpload());
+
 
 const whitelist = ["http://localhost:8080"];
 const options = {

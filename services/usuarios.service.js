@@ -29,7 +29,8 @@ class UsuariosService {
           "El correo ya se encuentra registrado."
         );
       } else {
-        next(error);
+        // next(error);
+        throw boom.badRequest("error: "+error)
       }
     }
   }

@@ -46,7 +46,7 @@ router.post(
   validatorHandler(createConfiguracionSchema, "body"),
   async (req, res, next) => {
     try {
-      const body = req.body;
+      const body = req.fields;
       const configuracion = await service.create(body);
       res.status(200).json({
         message: "Registro exitoso",

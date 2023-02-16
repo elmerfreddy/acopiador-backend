@@ -9,7 +9,7 @@ const password = Joi.string();
 const estado = Joi.string();
 const email = Joi.string().email({tlds: false});
 const token = Joi.string().token();
-const rol = Joi.valid('ADMIN', 'OBSCD', 'ENTIDAD', 'REPORTES');
+const rol = Joi.valid('ADMIN', 'USER1', 'ENTIDAD', 'REPORTES');
 
 
 const limit = Joi.number().integer();

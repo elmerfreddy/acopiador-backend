@@ -29,6 +29,7 @@ class AuthService {
     debug("usuario autenticado");
 
     delete usuario.password;
+    delete usuario.token;
     return usuario;
   }
 
